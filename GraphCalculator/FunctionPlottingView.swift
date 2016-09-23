@@ -23,14 +23,18 @@ class FunctionPlottingView: UIView {
     
     var crosshairLoc : CGPoint? = CGPoint(x: 50, y: 50)
     
+    var showCrossHair: Bool = true
+    
     func drawCrosshair(rect: CGRect) {
+        if delegate == nil {
+            return
+        }
         if crosshairLoc == nil {
             return
         }
         
+        let f = delegate?.functionToPlot()
         let path = UIBezierPath()
-        
-        // X Axis
         path.moveToPoint(CGPoint(x: 0, y: crosshairLoc!.y))
         path.addLineToPoint(CGPoint(x: rect.maxX, y:crosshairLoc!.y))
         
@@ -40,9 +44,18 @@ class FunctionPlottingView: UIView {
         
         UIColor.lightGrayColor().setStroke()
         path.stroke() // <- Does the actual drawing!!!
-        
-        let label = NSString(format: "(x:%.1f, y:%.1f)", crosshairLoc!.x, crosshairLoc!.y)
-        label.drawAtPoint(crosshairLoc!, withAttributes: nil)
+
+        if f == nil {
+            
+            let label = NSString(format: "(x:%.1f, y:%.1f)", crosshairLoc!.x, crosshairLoc!.y)
+            label.drawAtPoint(crosshairLoc!, withAttributes: nil)
+        }else{
+            let scale = Double(rect.width / 2.0)
+            let x = (Double(crosshairLoc!.x) - Double(rect.width)/2) / scale
+            let y = f!(x)
+            let label = NSString(format: "(x:%.1f, y:%.1f)", x, y)
+            label.drawAtPoint(crosshairLoc!, withAttributes: nil)
+        }
     }
     
     func drawFunction(rect: CGRect) {
@@ -187,7 +200,9 @@ class FunctionPlottingView: UIView {
         
         // Draw the function
         drawFunction(rect)
-        drawCrosshair(rect)
+        if showCrossHair{
+            drawCrosshair(rect)
+        }
     }
 
 }

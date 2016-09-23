@@ -18,13 +18,27 @@ class ViewController: UIViewController, UITextFieldDelegate, FunctionPlottingVie
         expressionEntryTextField.delegate = self
         plottingView.delegate = self
     }
-    @IBAction func tapGestureRecognized(sender: UITapGestureRecognizer) {
-        let tapLocation = sender.locationInView(plottingView)
-        print(tapLocation)
-        plottingView.crosshairLoc = tapLocation
-        plottingView.setNeedsDisplay()
-    }
 
+    @IBAction func tapGestureRecognized(sender: UITapGestureRecognizer) {
+            let tapLocation = sender.locationInView(plottingView)
+            plottingView.crosshairLoc = tapLocation
+            plottingView.setNeedsDisplay()
+        
+    }
+    
+    @IBAction func longTapGestureRecognized(sender: UILongPressGestureRecognizer) {
+            plottingView.showCrossHair = !plottingView.showCrossHair
+            plottingView.setNeedsDisplay()
+    }
+    
+    @IBAction func panGestureRecognized(sender: UIPanGestureRecognizer) {
+    
+    }
+    
+    @IBAction func pinchGestureRecognized(sender: UIPinchGestureRecognizer) {
+    
+    }
+    
     func textFieldShouldReturn(textField: UITextField) -> Bool {
         print("called textFieldShouldReturn")
         expressionEntryTextField.resignFirstResponder()
