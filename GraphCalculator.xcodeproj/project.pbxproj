@@ -12,6 +12,8 @@
 		BE18710F1D947BEB0033ABAD /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BE18710D1D947BEB0033ABAD /* Main.storyboard */; };
 		BE1871111D947BEB0033ABAD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BE1871101D947BEB0033ABAD /* Assets.xcassets */; };
 		BE1871141D947BEB0033ABAD /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BE1871121D947BEB0033ABAD /* LaunchScreen.storyboard */; };
+		BE235E441D94BDBA00A59C75 /* FunctionPlottingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE235E431D94BDBA00A59C75 /* FunctionPlottingView.swift */; };
+		BE82D6E41D94C00600D4C7E6 /* TryCatch.m in Sources */ = {isa = PBXBuildFile; fileRef = BE82D6E31D94C00600D4C7E6 /* TryCatch.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,6 +24,10 @@
 		BE1871101D947BEB0033ABAD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BE1871131D947BEB0033ABAD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		BE1871151D947BEB0033ABAD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		BE235E431D94BDBA00A59C75 /* FunctionPlottingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FunctionPlottingView.swift; sourceTree = "<group>"; };
+		BE82D6E31D94C00600D4C7E6 /* TryCatch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TryCatch.m; sourceTree = "<group>"; };
+		BE82D6E51D94C01900D4C7E6 /* TryCatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TryCatch.h; sourceTree = "<group>"; };
+		BE82D6E71D94C30800D4C7E6 /* GraphCalculator-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "GraphCalculator-Bridging-Header.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,9 +60,13 @@
 		BE1871081D947BEB0033ABAD /* GraphCalculator */ = {
 			isa = PBXGroup;
 			children = (
+				BE82D6E71D94C30800D4C7E6 /* GraphCalculator-Bridging-Header.h */,
+				BE82D6E51D94C01900D4C7E6 /* TryCatch.h */,
+				BE82D6E31D94C00600D4C7E6 /* TryCatch.m */,
 				BE1871091D947BEB0033ABAD /* AppDelegate.swift */,
 				BE18710B1D947BEB0033ABAD /* ViewController.swift */,
 				BE18710D1D947BEB0033ABAD /* Main.storyboard */,
+				BE235E431D94BDBA00A59C75 /* FunctionPlottingView.swift */,
 				BE1871101D947BEB0033ABAD /* Assets.xcassets */,
 				BE1871121D947BEB0033ABAD /* LaunchScreen.storyboard */,
 				BE1871151D947BEB0033ABAD /* Info.plist */,
@@ -137,6 +147,8 @@
 			files = (
 				BE18710C1D947BEB0033ABAD /* ViewController.swift in Sources */,
 				BE18710A1D947BEB0033ABAD /* AppDelegate.swift in Sources */,
+				BE235E441D94BDBA00A59C75 /* FunctionPlottingView.swift in Sources */,
+				BE82D6E41D94C00600D4C7E6 /* TryCatch.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -247,10 +259,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				INFOPLIST_FILE = GraphCalculator/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = Cornell.GraphCalculator;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "GraphCalculator/GraphCalculator-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -258,10 +274,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				INFOPLIST_FILE = GraphCalculator/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = Cornell.GraphCalculator;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "GraphCalculator/GraphCalculator-Bridging-Header.h";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
@@ -284,6 +303,7 @@
 				BE18711A1D947BEB0033ABAD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

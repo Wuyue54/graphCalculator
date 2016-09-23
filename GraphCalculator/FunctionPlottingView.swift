@@ -8,28 +8,186 @@
 
 import UIKit
 
-class FunctionPlottingView: UIViewController {
+func f(x : Double) -> Double { // (Double -> Double)
+    return x * x
+}
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
+protocol FunctionPlottingViewDelegate {
+    func functionToPlot() -> (Double -> Double)?
+}
 
-        // Do any additional setup after loading the view.
-    }
+class FunctionPlottingView: UIView {
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+
+    var delegate : FunctionPlottingViewDelegate?
+    
+    var crosshairLoc : CGPoint? = CGPoint(x: 50, y: 50)
+    
+    func drawCrosshair(rect: CGRect) {
+        if crosshairLoc == nil {
+            return
+        }
+        
+        let path = UIBezierPath()
+        
+        // X Axis
+        path.moveToPoint(CGPoint(x: 0, y: crosshairLoc!.y))
+        path.addLineToPoint(CGPoint(x: rect.maxX, y:crosshairLoc!.y))
+        
+        // Y Axis
+        path.moveToPoint(CGPoint(x: crosshairLoc!.x, y: 0))
+        path.addLineToPoint(CGPoint(x: crosshairLoc!.x, y:rect.maxY))
+        
+        UIColor.lightGrayColor().setStroke()
+        path.stroke() // <- Does the actual drawing!!!
+        
+        let label = NSString(format: "(x:%.1f, y:%.1f)", crosshairLoc!.x, crosshairLoc!.y)
+        label.drawAtPoint(crosshairLoc!, withAttributes: nil)
     }
     
+    func drawFunction(rect: CGRect) {
+        if delegate == nil {
+            return
+        }
+        
+        let f = delegate?.functionToPlot()
+        if f == nil {
+            return
+        }
+        
+        let scale = rect.width / 2.0
+        var prevP : CGPoint?
+        var prevP2 : CGPoint?
+        let path = UIBezierPath()
+        let path2 = UIBezierPath()
+        
+        if (f!(-1).isInfinite || f!(-1).isNaN )&&(f!(0).isInfinite||f!(0).isNaN ) && (f!(1).isInfinite || f!(1).isNaN){
+            return;
+        }else if (!f!(-1).isInfinite || !f!(-1).isNaN )&&(f!(0).isInfinite||f!(0).isNaN ) && (f!(1).isInfinite || f!(1).isNaN){
+            for var x = -1.0; x <= -0.01 ; x += 0.01 {
+                let y = f!(x)
+                
+                var p = CGPoint(x:x, y:y)
+                p.x *= scale
+                p.y *= -scale
+                
+                p.x += rect.midX
+                p.y += rect.midY
+                
+                if prevP == nil {
+                    path.moveToPoint(p)
+                } else {
+                    path.addLineToPoint(p)
+                }
+                prevP = p
+            }
+            UIColor.redColor().setStroke()
+            path.stroke()
+        }else if(f!(-1).isInfinite || f!(-1).isNaN )&&(f!(0).isInfinite||f!(0).isNaN ) && (!f!(1).isInfinite || !f!(1).isNaN){
+            print("log(x) should run into here")
+            for var x = 0.01; x <= 1.0 ; x += 0.01 {
+                let y = f!(x)
+    
+                var p = CGPoint(x:x, y:y)
+                p.x *= scale
+                p.y *= -scale
+                
+                p.x += rect.midX
+                p.y += rect.midY
+                
+                if prevP == nil {
+                    path.moveToPoint(p)
+                } else {
+                    path.addLineToPoint(p)
+                }
+                prevP = p
+            }
+            UIColor.redColor().setStroke()
+            path.stroke()
+        }else if(!f!(-1).isInfinite || !f!(-1).isNaN )&&(f!(0).isInfinite||f!(0).isNaN ) && (!f!(1).isInfinite || !f!(1).isNaN){
+            print("1/x should run into here")
+            for var x = -1.0; x <= -0.01 ; x += 0.01 {
+                let y = f!(x)
+                
+                var p = CGPoint(x:x, y:y)
+                p.x *= scale
+                p.y *= -scale
+                
+                p.x += rect.midX
+                p.y += rect.midY
+                
+                if prevP == nil {
+                    path.moveToPoint(p)
+                } else {
+                    path.addLineToPoint(p)
+                }
+                prevP = p
+            }
+          
+            
+            for var x = 0.01; x <= 1.0 ; x += 0.01 {
+                let y = f!(x)
+                var p = CGPoint(x:x, y:y)
+                p.x *= scale
+                p.y *= -scale
+                
+                p.x += rect.midX
+                p.y += rect.midY
+                
+                if prevP2 == nil {
+                    path2.moveToPoint(p)
+                } else {
+                    path2.addLineToPoint(p)
+                }
+                prevP2 = p
+            }
+            UIColor.redColor().setStroke()
+            path.stroke()
+            path2.stroke()
+            
+        }else{
+            for var x = -1.0; x <= 1.0; x += 0.01 {
+                let y = f!(x)
+                
+                var p = CGPoint(x:x, y:y)
+                p.x *= scale
+                p.y *= -scale
+                
+                p.x += rect.midX
+                p.y += rect.midY
+                
+                if prevP == nil {
+                    path.moveToPoint(p)
+                } else {
+                    path.addLineToPoint(p)
+                }
+                prevP = p
+            }
+            UIColor.redColor().setStroke()
+            path.stroke()
 
-    /*
-    // MARK: - Navigation
+        }
 
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
     }
-    */
+    
+    override func drawRect(rect: CGRect) {
+        let path = UIBezierPath()
+        
+        // X Axis
+        path.moveToPoint(CGPoint(x: 0.0, y: rect.midY))
+        path.addLineToPoint(CGPoint(x: rect.maxX, y:rect.midY))
+        UIColor.blueColor().setStroke()
+        
+        // Y Axis
+        path.moveToPoint(CGPoint(x: rect.midX, y: 0))
+        path.addLineToPoint(CGPoint(x: rect.midX, y:rect.maxY))
+        UIColor.blueColor().setStroke()
+        
+        path.stroke() // <- Does the actual drawing!!!
+        
+        // Draw the function
+        drawFunction(rect)
+        drawCrosshair(rect)
+    }
 
 }
