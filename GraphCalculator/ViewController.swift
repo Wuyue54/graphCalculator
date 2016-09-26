@@ -36,14 +36,15 @@ class ViewController: UIViewController, UITextFieldDelegate, FunctionPlottingVie
         print(fingerLoc.x)
         print(fingerLoc.y)
         
-        plottingView.transform =  CGAffineTransformMakeTranslation(fingerLoc.x, fingerLoc.y)
+//        plottingView.transform =  CGAffineTransformMakeTranslation(fingerLoc.x, fingerLoc.y)
 //        plottingView.setNeedsDisplay()
     }
     
     @IBAction func pinchGestureRecognized(sender: UIPinchGestureRecognizer) {
-//        let ratio =  sender.scale
+        let ratio =  sender.scale
 //        print(ratio)
-//        plottingView.transform = CGAffineTransformMakeTranslation(ratio, ratio);
+        plottingView.transform = CGAffineTransformMakeScale(ratio, ratio)
+//        sender.scale = 1.0
     }
     
     func textFieldShouldReturn(textField: UITextField) -> Bool {

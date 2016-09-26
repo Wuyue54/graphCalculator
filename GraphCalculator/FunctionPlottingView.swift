@@ -18,6 +18,7 @@ protocol FunctionPlottingViewDelegate {
 
 class FunctionPlottingView: UIView {
 
+    var originalPoint: Double?
 
     var delegate : FunctionPlottingViewDelegate?
     
@@ -185,7 +186,7 @@ class FunctionPlottingView: UIView {
     
     override func drawRect(rect: CGRect) {
         let path = UIBezierPath()
-        
+        let transform = CGAffineTransformMakeTranslation(200, 200)
         // X Axis
         path.moveToPoint(CGPoint(x: 0.0, y: rect.midY))
         path.addLineToPoint(CGPoint(x: rect.maxX, y:rect.midY))
@@ -197,6 +198,7 @@ class FunctionPlottingView: UIView {
         UIColor.blueColor().setStroke()
         
         path.stroke() // <- Does the actual drawing!!!
+        path.applyTransform(transform)
         
         // Draw the function
         drawFunction(rect)
