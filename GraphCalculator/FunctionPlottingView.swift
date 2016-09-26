@@ -203,6 +203,7 @@ class FunctionPlottingView: UIView {
         if showCrossHair{
             drawCrosshair(rect)
         }
+        
     }
 
 }

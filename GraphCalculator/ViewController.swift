@@ -32,11 +32,18 @@ class ViewController: UIViewController, UITextFieldDelegate, FunctionPlottingVie
     }
     
     @IBAction func panGestureRecognized(sender: UIPanGestureRecognizer) {
-    
+        let fingerLoc = sender.locationInView(plottingView)
+        print(fingerLoc.x)
+        print(fingerLoc.y)
+        
+        plottingView.transform =  CGAffineTransformMakeTranslation(fingerLoc.x, fingerLoc.y)
+//        plottingView.setNeedsDisplay()
     }
     
     @IBAction func pinchGestureRecognized(sender: UIPinchGestureRecognizer) {
-    
+//        let ratio =  sender.scale
+//        print(ratio)
+//        plottingView.transform = CGAffineTransformMakeTranslation(ratio, ratio);
     }
     
     func textFieldShouldReturn(textField: UITextField) -> Bool {
