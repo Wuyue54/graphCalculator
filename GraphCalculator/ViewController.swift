@@ -9,42 +9,42 @@
 import UIKit
 
 class ViewController: UIViewController, UITextFieldDelegate, FunctionPlottingViewDelegate {
-
+    
     @IBOutlet weak var expressionEntryTextField: UITextField!
     @IBOutlet weak var plottingView: FunctionPlottingView!
-   
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         expressionEntryTextField.delegate = self
         plottingView.delegate = self
     }
-
+    
     @IBAction func tapGestureRecognized(sender: UITapGestureRecognizer) {
-            let tapLocation = sender.locationInView(plottingView)
-            plottingView.crosshairLoc = tapLocation
-            plottingView.setNeedsDisplay()
+        let tapLocation = sender.locationInView(plottingView)
+        plottingView.crosshairLoc = tapLocation
+        plottingView.setNeedsDisplay()
         
     }
     
     @IBAction func longTapGestureRecognized(sender: UILongPressGestureRecognizer) {
-            plottingView.showCrossHair = !plottingView.showCrossHair
-            plottingView.setNeedsDisplay()
+        //            plottingView.showCrossHair = !plottingView.showCrossHair
+        plottingView.crosshairLoc = nil
+        plottingView.setNeedsDisplay()
     }
     
     @IBAction func panGestureRecognized(sender: UIPanGestureRecognizer) {
-        let fingerLoc = sender.locationInView(plottingView)
-        print(fingerLoc.x)
-        print(fingerLoc.y)
-        
-//        plottingView.transform =  CGAffineTransformMakeTranslation(fingerLoc.x, fingerLoc.y)
-//        plottingView.setNeedsDisplay()
+        if sender.state == UIGestureRecognizerState.Began{
+            plottingView.preTranslate = plottingView.translate
+        }
+        plottingView.translate = plottingView.preTranslate + sender.translationInView(plottingView)
+        plottingView.setNeedsDisplay()
     }
     
     @IBAction func pinchGestureRecognized(sender: UIPinchGestureRecognizer) {
         let ratio =  sender.scale
-//        print(ratio)
-        plottingView.transform = CGAffineTransformMakeScale(ratio, ratio)
-//        sender.scale = 1.0
+        plottingView.ratio = ratio
+        print(ratio)
+        plottingView.setNeedsDisplay()
     }
     
     func textFieldShouldReturn(textField: UITextField) -> Bool {
@@ -79,7 +79,18 @@ class ViewController: UIViewController, UITextFieldDelegate, FunctionPlottingVie
         
         return x2
     }
-
-
+    
+    
 }
+
+
+
+func + (left:CGPoint, right:CGPoint) -> CGPoint {
+    return CGPoint(x: left.x + right.x, y: left.y + right.y)
+}
+
+func += (inout left: CGPoint, right: CGPoint) {
+    left = left + right
+}
+
 

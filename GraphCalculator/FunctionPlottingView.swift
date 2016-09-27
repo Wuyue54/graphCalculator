@@ -18,15 +18,20 @@ protocol FunctionPlottingViewDelegate {
 
 class FunctionPlottingView: UIView {
 
-    var originalPoint: Double?
 
     var delegate : FunctionPlottingViewDelegate?
     
     var crosshairLoc : CGPoint? = CGPoint(x: 50, y: 50)
     
-    var showCrossHair: Bool = true
+    var preTranslate: CGPoint = CGPoint.zero
     
-    func drawCrosshair(rect: CGRect) {
+    var translate: CGPoint  = CGPoint.zero
+    
+    var ratio: CGFloat = 1.0
+    
+    func drawCrosshair(rect: CGRect, transform: CGAffineTransform) {
+        let inverted = CGAffineTransformInvert(transform)
+        
         if delegate == nil {
             return
         }
@@ -35,6 +40,23 @@ class FunctionPlottingView: UIView {
         }
         
         let f = delegate?.functionToPlot()
+       
+        if f == nil {
+            
+//            let label = NSString(format: "(x:%.1f, y:%.1f)", crosshairLoc!.x, crosshairLoc!.y)
+//            label.drawAtPoint(crosshairLoc!, withAttributes: nil)
+        }else{
+
+            var tempHair = CGPointApplyAffineTransform(crosshairLoc!, inverted)
+            let tempX = Double(tempHair.x)
+            tempHair.y = CGFloat(f!(tempX))
+            let label = NSString(format: "(x:%.1f, y:%.1f)", tempHair.x, tempHair.y)
+            crosshairLoc!.y = CGPointApplyAffineTransform(tempHair, transform).y
+            
+            print(crosshairLoc)
+            label.drawAtPoint(crosshairLoc!, withAttributes: nil)
+        }
+        
         let path = UIBezierPath()
         path.moveToPoint(CGPoint(x: 0, y: crosshairLoc!.y))
         path.addLineToPoint(CGPoint(x: rect.maxX, y:crosshairLoc!.y))
@@ -46,20 +68,9 @@ class FunctionPlottingView: UIView {
         UIColor.lightGrayColor().setStroke()
         path.stroke() // <- Does the actual drawing!!!
 
-        if f == nil {
-            
-            let label = NSString(format: "(x:%.1f, y:%.1f)", crosshairLoc!.x, crosshairLoc!.y)
-            label.drawAtPoint(crosshairLoc!, withAttributes: nil)
-        }else{
-            let scale = Double(rect.width / 2.0)
-            let x = (Double(crosshairLoc!.x) - Double(rect.width)/2) / scale
-            let y = f!(x)
-            let label = NSString(format: "(x:%.1f, y:%.1f)", x, y)
-            label.drawAtPoint(crosshairLoc!, withAttributes: nil)
-        }
     }
     
-    func drawFunction(rect: CGRect) {
+    func drawFunction(rect: CGRect, transform: CGAffineTransform) {
         if delegate == nil {
             return
         }
@@ -69,24 +80,31 @@ class FunctionPlottingView: UIView {
             return
         }
         
-        let scale = rect.width / 2.0
+
+        let hShift =  translate.x / transform.a
         var prevP : CGPoint?
         var prevP2 : CGPoint?
         let path = UIBezierPath()
         let path2 = UIBezierPath()
         
+        let left = -1.0/Double(ratio)
+        let right = 1.0/Double(ratio)
+        let step = (right - left)/200
+        let breakR = -step
+        let breakL = step
+        
+        print("step",step)
+        print("breakR",breakR)
+        print("breakL",breakL)
+        
         if (f!(-1).isInfinite || f!(-1).isNaN )&&(f!(0).isInfinite||f!(0).isNaN ) && (f!(1).isInfinite || f!(1).isNaN){
             return;
         }else if (!f!(-1).isInfinite || !f!(-1).isNaN )&&(f!(0).isInfinite||f!(0).isNaN ) && (f!(1).isInfinite || f!(1).isNaN){
-            for var x = -1.0; x <= -0.01 ; x += 0.01 {
-                let y = f!(x)
+            for var x = left; x <= breakR ; x += step {
+                let tempX = x - Double(hShift)
+                let y = f!(tempX)
                 
-                var p = CGPoint(x:x, y:y)
-                p.x *= scale
-                p.y *= -scale
-                
-                p.x += rect.midX
-                p.y += rect.midY
+                let p = CGPoint(x:tempX, y:y)
                 
                 if prevP == nil {
                     path.moveToPoint(p)
@@ -95,19 +113,14 @@ class FunctionPlottingView: UIView {
                 }
                 prevP = p
             }
-            UIColor.redColor().setStroke()
-            path.stroke()
+ 
         }else if(f!(-1).isInfinite || f!(-1).isNaN )&&(f!(0).isInfinite||f!(0).isNaN ) && (!f!(1).isInfinite || !f!(1).isNaN){
             print("log(x) should run into here")
-            for var x = 0.01; x <= 1.0 ; x += 0.01 {
-                let y = f!(x)
-    
-                var p = CGPoint(x:x, y:y)
-                p.x *= scale
-                p.y *= -scale
+            for var x = breakL; x <= right ; x += step {
+                let tempX = x - Double(hShift)
+                let y = f!(tempX)
                 
-                p.x += rect.midX
-                p.y += rect.midY
+                let p = CGPoint(x:tempX, y:y)
                 
                 if prevP == nil {
                     path.moveToPoint(p)
@@ -116,95 +129,94 @@ class FunctionPlottingView: UIView {
                 }
                 prevP = p
             }
-            UIColor.redColor().setStroke()
-            path.stroke()
-        }else if(!f!(-1).isInfinite || !f!(-1).isNaN )&&(f!(0).isInfinite||f!(0).isNaN ) && (!f!(1).isInfinite || !f!(1).isNaN){
-            print("1/x should run into here")
-            for var x = -1.0; x <= -0.01 ; x += 0.01 {
-                let y = f!(x)
-                
-                var p = CGPoint(x:x, y:y)
-                p.x *= scale
-                p.y *= -scale
-                
-                p.x += rect.midX
-                p.y += rect.midY
-                
-                if prevP == nil {
-                    path.moveToPoint(p)
-                } else {
-                    path.addLineToPoint(p)
-                }
-                prevP = p
-            }
-          
-            
-            for var x = 0.01; x <= 1.0 ; x += 0.01 {
-                let y = f!(x)
-                var p = CGPoint(x:x, y:y)
-                p.x *= scale
-                p.y *= -scale
-                
-                p.x += rect.midX
-                p.y += rect.midY
-                
-                if prevP2 == nil {
-                    path2.moveToPoint(p)
-                } else {
-                    path2.addLineToPoint(p)
-                }
-                prevP2 = p
-            }
-            UIColor.redColor().setStroke()
-            path.stroke()
-            path2.stroke()
-            
-        }else{
-            for var x = -1.0; x <= 1.0; x += 0.01 {
-                let y = f!(x)
-                
-                var p = CGPoint(x:x, y:y)
-                p.x *= scale
-                p.y *= -scale
-                
-                p.x += rect.midX
-                p.y += rect.midY
-                
-                if prevP == nil {
-                    path.moveToPoint(p)
-                } else {
-                    path.addLineToPoint(p)
-                }
-                prevP = p
-            }
-            UIColor.redColor().setStroke()
-            path.stroke()
 
         }
+//        else if(!f!(-1).isInfinite || !f!(-1).isNaN )&&(f!(0).isInfinite||f!(0).isNaN ) && (!f!(1).isInfinite || !f!(1).isNaN){
+//            print("1/x should run into here")
+//            for var x = left; x <= breakR ; x += step {
+//                let tempX = x - Double(hShift)
+//                let y = f!(tempX)
+//                
+//                let p = CGPoint(x:tempX, y:y)
+//                
+//                if prevP == nil {
+//                    path.moveToPoint(p)
+//                } else {
+//                    path.addLineToPoint(p)
+//                }
+//                prevP = p
+//            }
+//            
+//            for var x = breakL; x <= right; x += step {
+//                let tempX = x - Double(hShift)
+//                let y = f!(tempX)
+//                
+//                let p = CGPoint(x:tempX, y:y)
+//
+//                if prevP2 == nil {
+//                    path2.moveToPoint(p)
+//                } else {
+//                    path2.addLineToPoint(p)
+//                }
+//                prevP2 = p
+//            }
+//
+//            
+//        }
+        else{
+            for var x = left; x <= right; x += step {
+                let tempX = (x - Double(hShift)) / Double(ratio)
+                let y = f!(x)
+                print("ratio",ratio)
+                print("tempX",tempX)
+                print("Y", y)
+                
+                if(f!(x).isInfinite||f!(x).isNaN){
+                    print("FUCK")    
+                    continue
+                }
+                
+                let p = CGPoint(x:x, y:y)
+                
+                if prevP == nil {
+                    path.moveToPoint(p)
+                } else {
+                    path.addLineToPoint(p)
+                }
+                prevP = p
+            }
+        }
+        
+        path.applyTransform(transform)
+        path2.applyTransform(transform)
+        UIColor.redColor().setStroke()
+        path.stroke()
+        path2.stroke()
 
+        
     }
     
     override func drawRect(rect: CGRect) {
         let path = UIBezierPath()
-        let transform = CGAffineTransformMakeTranslation(200, 200)
+        let scale = ratio * rect.width / 2
+        let transform = CGAffineTransform(a: scale, b: 0, c: 0, d: -scale, tx: rect.midX+translate.x , ty: rect.midY+translate.y)
+        
+        
         // X Axis
-        path.moveToPoint(CGPoint(x: 0.0, y: rect.midY))
-        path.addLineToPoint(CGPoint(x: rect.maxX, y:rect.midY))
+        path.moveToPoint(CGPoint(x: 0.0, y: rect.midY + translate.y))
+        path.addLineToPoint(CGPoint(x: rect.maxX, y:rect.midY + translate.y))
         UIColor.blueColor().setStroke()
         
         // Y Axis
-        path.moveToPoint(CGPoint(x: rect.midX, y: 0))
-        path.addLineToPoint(CGPoint(x: rect.midX, y:rect.maxY))
+        path.moveToPoint(CGPoint(x: rect.midX + translate.x, y: 0))
+        path.addLineToPoint(CGPoint(x: rect.midX + translate.x, y:rect.maxY))
         UIColor.blueColor().setStroke()
         
         path.stroke() // <- Does the actual drawing!!!
-        path.applyTransform(transform)
-        
+      
         // Draw the function
-        drawFunction(rect)
-        if showCrossHair{
-            drawCrosshair(rect)
-        }
+        drawFunction(rect, transform:transform)
+        drawCrosshair(rect, transform:transform)
         
     }
 
